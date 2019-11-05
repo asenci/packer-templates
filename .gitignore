@@ -1,0 +1,5 @@
+# Build directory
+build/
+
+# Cached objects
+packer_cache/
