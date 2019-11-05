@@ -1,0 +1,58 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "<up><wait><tab> ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `ks_path` }}<enter><wait>"
+      ],
+      "cpus": "{{ user `vm_cpus` }}",
+      "disk_additional_size": "{{ user `vm_swap_size` }}",
+      "disk_size": "{{ user `vm_disk_size` }}",
+      "guest_os_type": "{{ user `vm_guest_os` }}",
+      "headless": "{{ user `vm_headless` }}",
+      "http_directory": "{{ template_dir }}/http",
+      "iso_checksum_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/sha256sum.txt",
+      "iso_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/{{ user `iso_name` }}",
+      "memory": "{{ user `vm_memory` }}",
+      "output_directory": "{{ user `build_directory` }}/vmware/{{ user `name` }}",
+      "shutdown_command": "/sbin/halt -h -p",
+      "ssh_password": "changeme",
+      "ssh_port": 22,
+      "ssh_username": "root",
+      "ssh_wait_timeout": "10000s",
+      "type": "vmware-iso",
+      "vm_name": "{{ user `name` }}",
+      "vmdk_name": "{{ user `name` }}",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1"
+      },
+      "vmx_remove_ethernet_interfaces": true
+    }
+  ],
+  "post-processors": [
+    {
+      "keep_input_artifact": true,
+      "output": "{{ user `build_directory` }}/vagrant/{{ user `name` }}.{{ .Provider }}.box",
+      "type": "vagrant"
+    }
+  ],
+  "provisioners": [],
+  "variables": {
+    "build_directory": "build",
+    "centos_arch": "x86_64",
+    "centos_build": "1908",
+    "centos_major": "7",
+    "centos_product": "CentOS",
+    "centos_release": "7",
+    "iso_name": "{{ user `centos_product` }}-{{ user `centos_major` }}-{{ user `centos_arch` }}-Minimal-{{ user `centos_build` }}.iso",
+    "ks_path": "ks.cfg",
+    "mirror_path": "{{ user `centos_major` }}.{{ user `centos_release` }}.{{ user `centos_build` }}/isos/{{ user `centos_arch` }}",
+    "mirror_url": "http://mirror.centos.org/centos",
+    "name": "{{ user `centos_product` }}-{{ user `centos_major` }}.{{ user `centos_release` }}.{{ user `centos_build` }}-{{ user `centos_arch` }}",
+    "vm_cpus": "1",
+    "vm_disk_size": "4096",
+    "vm_guest_os": "{{ user `centos_product` | lower }}{{ user `centos_major` }}-64",
+    "vm_headless": "false",
+    "vm_memory": "512",
+    "vm_swap_size": "1024"
+  }
+}
