@@ -3,3 +3,6 @@ build/
 
 # Cached objects
 packer_cache/
+
+# Tokens
+**/vars/*token.json

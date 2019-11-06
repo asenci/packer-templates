@@ -20,13 +20,20 @@
     }
   ],
   "post-processors": [
-    {
-      "compression_level": 9,
-      "keep_input_artifact": true,
-      "output": "{{ user `build_directory` }}/vagrant/{{ user `vm_name` }}.{{ .Provider }}.box",
-      "type": "vagrant",
-      "vagrantfile_template": "files/Vagrantfile.rb"
-    }
+    [
+      {
+        "compression_level": 9,
+        "output": "{{ user `build_directory` }}/vagrant/{{ user `vm_name` }}.{{ .Provider }}.box",
+        "type": "vagrant",
+        "vagrantfile_template": "files/Vagrantfile.rb"
+      },
+      {
+        "access_token": "{{ user `cloud_token` }}",
+        "box_tag": "{{ user `box_tag` }}",
+        "type": "vagrant-cloud",
+        "version": "{{ user `box_version` }}"
+      }
+    ]
   ],
   "provisioners": [
     {
@@ -59,7 +66,11 @@
     }
   ],
   "variables": {
+    "box_tag": "{{ user `cloud_org` }}/{{ user `os_product` | lower }}{{ user `os_major` }}",
+    "box_version": "{{ user `os_build` }}.{{ timestamp }}",
     "build_directory": "build",
+    "cloud_org": "",
+    "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
     "os_arch": "",
     "os_build": "",
     "os_major": "",
