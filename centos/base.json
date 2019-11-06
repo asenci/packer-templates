@@ -9,7 +9,7 @@
       "disk_size": "{{ user `vm_disk_size` }}",
       "guest_os_type": "{{ user `vm_guest_os` }}",
       "headless": "{{ user `vm_headless` }}",
-      "http_directory": "{{ template_dir }}/http",
+      "http_directory": "{{ user `http_directory` }}",
       "iso_checksum_url": "{{ user `iso_checksum_url` }}",
       "iso_url": "{{ user `iso_url` }}",
       "memory": "{{ user `vm_build_memory` }}",
@@ -83,7 +83,8 @@
     }
   ],
   "variables": {
-    "build_directory": "build",
+    "build_directory": "{{ template_dir }}/build",
+    "http_directory": "{{ template_dir }}/http",
     "iso_checksum_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/sha256sum.txt",
     "iso_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/{{ user `os_product` }}-{{ user `os_major` }}-{{ user `os_arch` }}-Minimal-{{ user `os_build` }}.iso",
     "ks_path": "ks.cfg",

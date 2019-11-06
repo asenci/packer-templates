@@ -68,7 +68,7 @@
   "variables": {
     "box_tag": "{{ user `cloud_org` }}/{{ user `os_product` | lower }}{{ user `os_major` }}",
     "box_version": "{{ user `os_build` }}.{{ timestamp }}",
-    "build_directory": "build",
+    "build_directory": "{{ template_dir }}/build",
     "cloud_org": "",
     "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
     "os_arch": "",
