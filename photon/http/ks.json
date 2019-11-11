@@ -1,0 +1,55 @@
+{
+  "bootmode": "bios",
+  "disk": "/dev/sda",
+  "hostname": "localhost",
+  "install_linux_esx": true,
+  "packages": [
+    "bc",
+    "bzip2",
+    "curl",
+    "dbus",
+    "e2fsprogs",
+    "file",
+    "filesystem",
+    "gzip",
+    "iana-etc",
+    "initramfs",
+    "iproute2",
+    "iputils",
+    "linux",
+    "open-vm-tools",
+    "openssh",
+    "photon-release",
+    "photon-repos",
+    "procps-ng",
+    "rpm",
+    "tdnf",
+    "tzdata",
+    "vim",
+    "which"
+  ],
+  "partition_type": "msdos",
+  "partitions": [
+    {
+      "filesystem": "ext4",
+      "mountpoint": "/boot",
+      "size": 128
+    },
+    {
+      "filesystem": "ext4",
+      "mountpoint": "/",
+      "size": 0
+    }
+  ],
+  "password": {
+    "crypted": false,
+    "text": "changeme"
+  },
+  "postinstall": [
+    "#!/bin/sh",
+    "sed -i 's/^PermitRootLogin no$/PermitRootLogin yes/g' /etc/ssh/sshd_config",
+    "sed -i 's/^set timeout=5$/set timeout=1/g' /boot/grub2/grub.cfg",
+    "systemctl enable sshd-keygen.service sshd.service"
+  ],
+  "ui": true
+}

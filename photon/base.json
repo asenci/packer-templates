@@ -1,0 +1,89 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "<esc><wait>vmlinuz initrd=initrd.img root=/dev/ram0 loglevel=3 ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `ks_path` }} photon.media=cdrom<enter>"
+      ],
+      "cpus": "{{ user `vm_build_cpus` }}",
+      "disk_adapter_type": "{{ user `vm_disk_adapter` }}",
+      "disk_size": "{{ user `vm_disk_size` }}",
+      "guest_os_type": "{{ user `vm_guest_os` }}",
+      "headless": "{{ user `vm_headless` }}",
+      "http_directory": "{{ user `http_directory` }}",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_url": "{{ user `iso_url` }}",
+      "memory": "{{ user `vm_build_memory` }}",
+      "name": "vmware_desktop",
+      "network_adapter_type": "{{ user `vm_network_adapter` }}",
+      "output_directory": "{{ user `build_directory` }}/base/{{ user `vm_name` }}.vmwarevm",
+      "shutdown_command": "shutdown -h now",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_port": "{{ user `ssh_port` }}",
+      "ssh_username": "{{ user `ssh_username` }}",
+      "type": "vmware-iso",
+      "vm_name": "{{ user `vm_name` }}",
+      "vmdk_name": "{{ user `vm_name` }}",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "rtc.diffFromUTC": "0",
+        "tools.syncTime": "false"
+      },
+      "vmx_data_post": {
+        "ide0:0.present": "false",
+        "memsize": "{{ user `vm_memory` }}",
+        "numvcpus": "{{ user `vm_cpus` }}"
+      },
+      "vmx_remove_ethernet_interfaces": true
+    }
+  ],
+  "provisioners": [
+    {
+      "expect_disconnect": true,
+      "script": "scripts/update_and_reboot.sh",
+      "type": "shell"
+    },
+    {
+      "destination": "/etc/environment",
+      "source": "files/environment",
+      "type": "file"
+    },
+    {
+      "destination": "/etc/sysctl.d/10-vm_swappiness.conf",
+      "source": "files/systcl-swappiness.conf",
+      "type": "file"
+    },
+    {
+      "scripts": [
+        "scripts/openssh.sh",
+        "scripts/swapfile.sh",
+        "scripts/cleanup.sh"
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "build_directory": "{{ template_dir }}/build",
+    "http_directory": "{{ template_dir }}/http",
+    "iso_checksum": "",
+    "iso_url": "",
+    "ks_path": "ks.json",
+    "os_arch": "",
+    "os_build": "",
+    "os_major": "",
+    "os_minor": "",
+    "os_product": "",
+    "ssh_password": "changeme",
+    "ssh_port": "22",
+    "ssh_username": "root",
+    "vm_build_cpus": "2",
+    "vm_build_memory": "512",
+    "vm_cpus": "1",
+    "vm_disk_adapter": "pvscsi",
+    "vm_disk_size": "20480",
+    "vm_guest_os": "vmware-photon-64",
+    "vm_headless": "true",
+    "vm_memory": "512",
+    "vm_name": "{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
+    "vm_network_adapter": "vmxnet3"
+  }
+}
