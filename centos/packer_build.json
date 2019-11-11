@@ -2,23 +2,26 @@
   "builders": [
     {
       "boot_command": [
-        "<up><wait><tab> no_timer_check biosdevname=0 net.ifnames=0 ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `ks_path` }}<enter><wait>"
+        "<up><wait><tab>",
+        " no_timer_check biosdevname=0 net.ifnames=0",
+        " ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `ks_path` }}",
+        "<enter>"
       ],
       "cpus": "{{ user `vm_build_cpus` }}",
       "disk_adapter_type": "{{ user `vm_disk_adapter` }}",
       "disk_size": "{{ user `vm_disk_size` }}",
+      "display_name": "{{ user `vm_name` }}",
       "guest_os_type": "{{ user `vm_guest_os` }}",
       "headless": "{{ user `vm_headless` }}",
       "http_directory": "{{ user `http_directory` }}",
       "iso_checksum_url": "{{ user `iso_checksum_url` }}",
       "iso_url": "{{ user `iso_url` }}",
       "memory": "{{ user `vm_build_memory` }}",
-      "name": "vmware_desktop",
       "network_adapter_type": "{{ user `vm_network_adapter` }}",
-      "output_directory": "{{ user `build_directory` }}/base/{{ user `vm_name` }}.vmwarevm",
-      "shutdown_command": "/sbin/halt -h -p",
-      "ssh_password": "{{ user `ssh_password` }}",
+      "output_directory": "{{ user `box_path` }}.vmwarevm",
+      "shutdown_command": "sudo /sbin/halt -h -p",
       "ssh_port": "{{ user `ssh_port` }}",
+      "ssh_private_key_file": "{{ user `ssh_private_key_file` }}",
       "ssh_username": "{{ user `ssh_username` }}",
       "type": "vmware-iso",
       "vm_name": "{{ user `vm_name` }}",
@@ -36,57 +39,42 @@
       "vmx_remove_ethernet_interfaces": true
     }
   ],
+  "post-processors": [
+    [
+      {
+        "compression_level": 9,
+        "output": "{{ user `box_path` }}.{{ .Provider }}.box",
+        "type": "vagrant",
+        "vagrantfile_template": "{{ template_dir }}/files/Vagrantfile.rb"
+      },
+      {
+        "access_token": "{{ user `cloud_token` }}",
+        "box_tag": "{{ user `box_tag` }}",
+        "type": "vagrant-cloud",
+        "version": "{{ user `box_version` }}"
+      }
+    ]
+  ],
   "provisioners": [
     {
+      "execute_command": "sudo bash {{.Path}}",
       "expect_disconnect": true,
-      "script": "scripts/update_and_reboot.sh",
+      "script": "{{ template_dir }}/files/provision.sh",
       "type": "shell"
     },
     {
-      "destination": "/etc/dracut.conf.d/omit-floppy.conf",
-      "source": "files/dracut-nofloppy.conf",
-      "type": "file"
-    },
-    {
-      "destination": "/etc/dracut.conf.d/vmware-drivers.conf",
-      "only": [
-        "vmware_desktop"
-      ],
-      "source": "files/dracut-vmware.conf",
-      "type": "file"
-    },
-    {
-      "destination": "/etc/environment",
-      "source": "files/environment",
-      "type": "file"
-    },
-    {
-      "destination": "/etc/modprobe.d/floppy-blacklist.conf",
-      "source": "files/modprobe-nofloppy.conf",
-      "type": "file"
-    },
-    {
-      "destination": "/etc/sysconfig/network-scripts/ifcfg-eth0",
-      "source": "files/ifcfg-eth0",
-      "type": "file"
-    },
-    {
-      "destination": "/etc/sysctl.d/10-vm_swappiness.conf",
-      "source": "files/systcl-swappiness.conf",
-      "type": "file"
-    },
-    {
-      "scripts": [
-        "scripts/networking.sh",
-        "scripts/openssh.sh",
-        "scripts/swapfile.sh",
-        "scripts/cleanup.sh"
-      ],
+      "execute_command": "sudo bash {{.Path}}",
+      "script": "{{ template_dir }}/files/cleanup.sh",
       "type": "shell"
     }
   ],
   "variables": {
+    "box_path": "{{ user `build_directory` }}/{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
+    "box_tag": "{{ user `cloud_organization` }}/{{ user `os_product` | lower }}{{ user `os_major` }}",
+    "box_version": "{{ user `os_build` }}.{{ timestamp }}",
     "build_directory": "{{ template_dir }}/build",
+    "cloud_organization": "{{ env `VAGRANT_CLOUD_ORGANIZATION` }}",
+    "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
     "http_directory": "{{ template_dir }}/http",
     "iso_checksum_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/sha256sum.txt",
     "iso_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/{{ user `os_product` }}-{{ user `os_major` }}-{{ user `os_arch` }}-Minimal-{{ user `os_build` }}.iso",
@@ -98,9 +86,9 @@
     "os_major": "",
     "os_minor": "",
     "os_product": "",
-    "ssh_password": "changeme",
     "ssh_port": "22",
-    "ssh_username": "root",
+    "ssh_private_key_file": "{{ template_dir }}/files/id_rsa",
+    "ssh_username": "vagrant",
     "vm_build_cpus": "2",
     "vm_build_memory": "544",
     "vm_cpus": "1",
@@ -109,7 +97,7 @@
     "vm_guest_os": "{{ user `os_product` | lower }}{{ user `os_major` }}-64",
     "vm_headless": "true",
     "vm_memory": "512",
-    "vm_name": "{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
+    "vm_name": "{{ user `os_product` }}",
     "vm_network_adapter": "vmxnet3"
   }
 }

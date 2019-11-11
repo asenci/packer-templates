@@ -33,6 +33,8 @@ rm -f /var/lib/rsyslog/imjournal.state
 /usr/sbin/logrotate -f /etc/logrotate.conf
 rm -f /var/log/*-???????? /var/log/*.gz
 rm -f /var/log/dmesg.old
+rm -f /var/log/vmware-*.log
+rm -f /var/log/vmware-*.log.0
 :>/var/log/lastlog
 :>/var/log/tallylog
 :>/var/log/wtmp
@@ -63,23 +65,17 @@ pkill dhclient
 rm -f /var/lib/dhclient/dhclient-*.lease
 
 
-# Remove swapfile if created
-if [ -f /swapfile ]; then
-	export SWAPSIZE=`stat --printf="%s" /swapfile`
-	swapoff /swapfile 2>/dev/null || true
-	rm -f /swapfile
-fi
-
 # Defrag disk
 dd if=/dev/zero of=/zero.img bs=1M oflag=direct status=none 2>/dev/null || true
 rm -f /zero.img
 
-# Re-create swapfile
-if [ -n "$SWAPSIZE" ]; then
-	dd if=/dev/zero of=/swapfile bs=1M oflag=direct status=none count="$SWAPSIZE" iflag=count_bytes
-	chmod 600 /swapfile
-	mkswap /swapfile >/dev/null
-fi
+
+# Create swapfile
+dd if=/dev/zero of=/swapfile bs=1M oflag=direct status=none count=2048
+chmod 600 /swapfile
+mkswap /swapfile >/dev/null
+echo "/swapfile none swap defaults 0 0" >> /etc/fstab
+
 
 # Make sure all disk IO has finished
 sync

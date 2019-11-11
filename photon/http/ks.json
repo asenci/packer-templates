@@ -32,24 +32,35 @@
   "partitions": [
     {
       "filesystem": "ext4",
-      "mountpoint": "/boot",
-      "size": 128
-    },
-    {
-      "filesystem": "ext4",
       "mountpoint": "/",
       "size": 0
     }
   ],
   "password": {
     "crypted": false,
-    "text": "changeme"
+    "text": "vagrant"
   },
   "postinstall": [
     "#!/bin/sh",
-    "sed -i 's/^PermitRootLogin no$/PermitRootLogin yes/g' /etc/ssh/sshd_config",
-    "sed -i 's/^set timeout=5$/set timeout=1/g' /boot/grub2/grub.cfg",
-    "systemctl enable sshd-keygen.service sshd.service"
+    "systemctl enable sshd-keygen.service sshd.service",
+    "",
+    "tdnf -q -y install sudo",
+    "cat > /etc/sudoers.d/vagrant << EOF",
+    "Defaults:vagrant env_keep += \"SSH_AUTH_SOCK\"",
+    "Defaults:vagrant !requiretty",
+    "vagrant ALL=(ALL) NOPASSWD: ALL",
+    "EOF",
+    "chmod 0440 /etc/sudoers.d/vagrant",
+    "",
+    "useradd --create-home --user-group vagrant",
+    "install -o vagrant -g vagrant -m 0700 -d /home/vagrant/.ssh",
+    "install -o vagrant -g vagrant -m 0600 /dev/null /home/vagrant/.ssh/authorized_keys",
+    "curl -s -o /home/vagrant/.ssh/authorized_keys 'https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub'",
+    "",
+    "chpasswd 2>/dev/null << EOF",
+    "root:vagrant",
+    "vagrant:vagrant",
+    "EOF"
   ],
   "ui": true
 }

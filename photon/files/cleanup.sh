@@ -3,13 +3,15 @@
 # Clean-up tdnf
 tdnf -q -y clean all >/dev/null
 
+
 # Clean-up log files
+rm -rf /var/log/journal/*
+ln -s /var/opt/journal/log /var/log/journal/log
 rm -f /var/log/vmware-*.log
 rm -f /var/log/vmware-*.log.0
-rm -f /var/log/cloud-init.log
-rm -f /var/log/cloud-init-output.log
 :>/var/log/lastlog
 :>/var/log/wtmp
+
 
 # Reset SSH host keys
 systemctl stop sshd
@@ -20,7 +22,6 @@ rm -f /etc/ssh/ssh_host_*
 rm -f /etc/udev/hwdb.bin
 rm -rf /tmp/*
 rm -f /var/lib/systemd/random-seed
-rm -rf /var/lib/cloud
 rm -rf /var/cache/*
 rm -rf /var/tmp/*
 
@@ -32,25 +33,19 @@ rm -rf /var/tmp/*
 :>/etc/machine-id
 
 
-# Remove swapfile if created
-if [ -f /swapfile ]; then
-	export SWAPSIZE=`stat --printf="%s" /swapfile`
-	swapoff /swapfile 2>/dev/null || true
-	rm -f /swapfile
-fi
-
 # Defrag disk
 dd if=/dev/zero of=/boot/zero.img bs=1M oflag=direct status=none 2>/dev/null || true
 rm -f /boot/zero.img
 dd if=/dev/zero of=/zero.img bs=1M oflag=direct status=none 2>/dev/null || true
 rm -f /zero.img
 
-# Re-create swapfile
-if [ -n "$SWAPSIZE" ]; then
-	dd if=/dev/zero of=/swapfile bs=1M oflag=direct status=none count="$SWAPSIZE" iflag=count_bytes
-	chmod 600 /swapfile
-	mkswap /swapfile >/dev/null
-fi
+
+# Create swapfile
+dd if=/dev/zero of=/swapfile bs=1M oflag=direct status=none count=2048
+chmod 600 /swapfile
+mkswap /swapfile >/dev/null
+echo "/swapfile none swap defaults 0 0" >> /etc/fstab
+
 
 # Make sure all disk IO has finished
 sync
