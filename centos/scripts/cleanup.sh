@@ -77,6 +77,7 @@ rm -f /zero.img
 # Re-create swapfile
 if [ -n "$SWAPSIZE" ]; then
 	dd if=/dev/zero of=/swapfile bs=1M oflag=direct status=none count="$SWAPSIZE" iflag=count_bytes
+	chmod 600 /swapfile
 	mkswap /swapfile >/dev/null
 fi
 

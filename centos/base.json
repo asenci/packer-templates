@@ -24,9 +24,12 @@
       "vm_name": "{{ user `vm_name` }}",
       "vmdk_name": "{{ user `vm_name` }}",
       "vmx_data": {
-        "cpuid.coresPerSocket": "1"
+        "cpuid.coresPerSocket": "1",
+        "rtc.diffFromUTC": "0",
+        "tools.syncTime": "false"
       },
       "vmx_data_post": {
+        "ide0:0.present": "false",
         "memsize": "{{ user `vm_memory` }}",
         "numvcpus": "{{ user `vm_cpus` }}"
       },
