@@ -9,12 +9,6 @@ tdnf -q -y update
 tdnf -q -y install rng-tools
 
 
-# VMWare
-cat > /etc/sysctl.d/10-vm_swappiness.conf << EOF
-vm.swappiness = 1
-EOF
-
-
 # Locale
 cat > /etc/locale.conf << EOF
 LANG='en_US.UTF-8'
@@ -33,6 +27,23 @@ GSSAPIAuthentication no
 PasswordAuthentication no
 PermitRootLogin no
 UseDNS no
+EOF
+
+
+# Vagrant
+install -d -m 0755 /etc/systemd/logind.conf.d
+cat > /etc/systemd/logind.conf.d/vagrant.conf << EOF
+# Do not kill user processes after logging out.
+# Otherwise vmhgfs-fuse will be killed and Vagrant
+# synced dirs won't be accessible
+[Login]
+KillUserProcesses=no
+EOF
+chmod 0644 /etc/systemd/logind.conf.d/vagrant.conf
+
+# VMWare
+cat > /etc/sysctl.d/10-vm_swappiness.conf << EOF
+vm.swappiness = 1
 EOF
 
 
