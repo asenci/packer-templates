@@ -1,41 +1,44 @@
 #!/bin/bash
 
 # Yum
+cat > /etc/yum/vars/infra << EOF
+vag
+EOF
+
 rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 
 sed -i -e '/^\[main\]/a deltarpm=0' /etc/yum.conf
 
 yum -q -y update
 
-yum -q -y install open-vm-tools rng-tools
+yum -q -y install rng-tools
 
 
-# Vagrant
-cat > /etc/sudoers.d/vagrant << EOF
-Defaults:vagrant env_keep += "SSH_AUTH_SOCK"
-Defaults:vagrant !requiretty
-vagrant ALL=(ALL) NOPASSWD: ALL
-EOF
+# Hypervisor
+case "${PACKER_BUILDER_TYPE}" in
+	parallels-iso)
+		;;
 
-chmod 0440 /etc/sudoers.d/vagrant
+	vmware-iso)
+		# VMWare
+		yum -q -y install open-vm-tools
 
-cat > /etc/yum/vars/infra << EOF
-vag
-EOF
+		cat > /etc/dracut.conf.d/vmware.conf <<- EOF
+		add_drivers+=" vmw_pvscsi "
+		EOF
+		;;
+	*)
+		echo "Builder \"${PACKER_BUILDER_TYPE}\" does not match any pre-defined builders" >&2
+esac
 
 
-# VMWare
-cat > /etc/dracut.conf.d/vmware.conf << EOF
-add_drivers+=" vmw_pvscsi "
+# Disable floppy
+cat > /etc/dracut.conf.d/nofloppy.conf << EOF
 omit_drivers+=" floppy "
 EOF
 
-cat > /etc/modprobe.d/vmware.conf << EOF
+cat > /etc/modprobe.d/nofloppy.conf << EOF
 blacklist floppy
-EOF
-
-cat > /etc/sysctl.d/10-vm_swappiness.conf << EOF
-vm.swappiness = 1
 EOF
 
 
@@ -43,6 +46,12 @@ EOF
 cat > /etc/locale.conf << EOF
 LANG='en_US.UTF-8'
 LC_COLLATE='C'
+EOF
+
+
+# Sysctl
+cat > /etc/sysctl.d/10-vm_swappiness.conf << EOF
+vm.swappiness = 1
 EOF
 
 

@@ -26,6 +26,14 @@ rm -f /root/original-ks.cfg
 rm -rf /var/log/anaconda
 
 
+# Hypervisor
+case "${PACKER_BUILDER_TYPE}" in
+	parallels-iso)
+		rm -f "~/.prlctl_version"
+		;;
+esac
+
+
 # Clean-up log files
 systemctl stop rsyslog.service syslog.socket
 rm -f /var/lib/rsyslog/imjournal.state
