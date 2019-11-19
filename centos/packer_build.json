@@ -57,13 +57,13 @@
   ],
   "provisioners": [
     {
-      "execute_command": "sudo bash {{.Path}}",
+      "execute_command": "{{ .Vars }} sudo -E bash '{{ .Path }}'",
       "expect_disconnect": true,
       "script": "{{ template_dir }}/files/provision.sh",
       "type": "shell"
     },
     {
-      "execute_command": "sudo bash {{.Path}}",
+      "execute_command": "{{ .Vars }} sudo -E bash '{{ .Path }}'",
       "script": "{{ template_dir }}/files/cleanup.sh",
       "type": "shell"
     }
