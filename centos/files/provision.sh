@@ -40,7 +40,7 @@ EOF
 
 
 # Locale
-cat > /etc/environment << EOF
+cat > /etc/locale.conf << EOF
 LANG='en_US.UTF-8'
 LC_COLLATE='C'
 EOF
