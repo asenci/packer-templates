@@ -18,7 +18,7 @@
       "iso_url": "{{ user `iso_url` }}",
       "memory": "{{ user `vm_build_memory` }}",
       "network_adapter_type": "{{ user `vm_network_adapter` }}",
-      "output_directory": "{{ user `box_path` }}.vmwarevm",
+      "output_directory": "{{ user `build_directory` }}/{{ build_type }}/{{ user `vm_name` | replace_all \" \" \"_\" }}.vmwarevm",
       "shutdown_command": "sudo /sbin/halt -h -p",
       "ssh_port": "{{ user `ssh_port` }}",
       "ssh_private_key_file": "{{ user `ssh_private_key_file` }}",
@@ -43,7 +43,7 @@
     [
       {
         "compression_level": 9,
-        "output": "{{ user `box_path` }}.{{ .Provider }}.box",
+        "output": "{{ user `build_directory` }}/vagrant/{{ .Provider }}.box",
         "type": "vagrant",
         "vagrantfile_template": "{{ template_dir }}/files/Vagrantfile.rb"
       },
@@ -69,10 +69,9 @@
     }
   ],
   "variables": {
-    "box_path": "{{ user `build_directory` }}/{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
     "box_tag": "{{ user `cloud_organization` }}/{{ user `os_product` | lower }}{{ user `os_major` }}",
     "box_version": "{{ user `os_build` }}.{{ timestamp }}",
-    "build_directory": "{{ template_dir }}/build",
+    "build_directory": "{{ template_dir }}/build/{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
     "cloud_organization": "{{ env `VAGRANT_CLOUD_ORGANIZATION` }}",
     "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
     "http_directory": "{{ template_dir }}/http",
