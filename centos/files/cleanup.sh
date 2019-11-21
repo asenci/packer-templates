@@ -4,7 +4,7 @@
 rpm -q linux-firmware >/dev/null && yum -q -y autoremove linux-firmware
 
 # Remove old kernel versions
-rpm -qa kernel | head -n -1 | xargs yum -q -y autoremove
+rpm -qa kernel | grep -v "$(uname -r)" | xargs yum -q -y autoremove
 
 # Clean-up yum
 yum -q -y autoremove
