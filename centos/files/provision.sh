@@ -17,6 +17,9 @@ yum -q -y install rng-tools
 # Hypervisor
 case "${PACKER_BUILDER_TYPE}" in
 	parallels-iso)
+		# Parallels Desktop
+		yum -q -y install https://asenci.github.io/parallels-tools-rpm/centos/7/x86_64/Packages/parallels-tools-release-7-1.noarch.rpm
+		yum -q -y install parallels-tools
 		;;
 
 	vmware-iso)
@@ -27,6 +30,7 @@ case "${PACKER_BUILDER_TYPE}" in
 		add_drivers+=" vmw_pvscsi "
 		EOF
 		;;
+
 	*)
 		echo "Builder \"${PACKER_BUILDER_TYPE}\" does not match any pre-defined builders" >&2
 esac
