@@ -34,8 +34,6 @@ rm -rf /var/tmp/*
 
 
 # Defrag disk
-dd if=/dev/zero of=/boot/zero.img bs=1M oflag=direct status=none 2>/dev/null || true
-rm -f /boot/zero.img
 dd if=/dev/zero of=/zero.img bs=1M oflag=direct status=none 2>/dev/null || true
 rm -f /zero.img
 

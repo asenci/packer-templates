@@ -8,8 +8,9 @@
         "<enter>"
       ],
       "cpus": "{{ user `vm_build_cpus` }}",
-      "disk_adapter_type": "{{ user `vm_disk_adapter` }}",
+      "disk_adapter_type": "{{ user `vmware_disk_adapter` }}",
       "disk_size": "{{ user `vm_disk_size` }}",
+      "disk_type_id": "0",
       "display_name": "{{ user `vm_name` }}",
       "guest_os_type": "{{ user `vm_guest_os` }}",
       "headless": "{{ user `vm_headless` }}",
@@ -17,11 +18,11 @@
       "iso_checksum": "{{ user `iso_checksum` }}",
       "iso_url": "{{ user `iso_url` }}",
       "memory": "{{ user `vm_build_memory` }}",
-      "network_adapter_type": "{{ user `vm_network_adapter` }}",
-      "output_directory": "{{ user `box_path` }}.vmwarevm",
-      "shutdown_command": "sudo shutdown -h now",
+      "network_adapter_type": "{{ user `vmware_network_adapter` }}",
+      "output_directory": "{{ user `build_directory` }}/{{ build_type }}/{{ user `vm_name` | replace_all \" \" \"_\" }}.vmwarevm",
+      "shutdown_command": "shutdown -h now",
+      "ssh_password": "{{ user `ssh_password` }}",
       "ssh_port": "{{ user `ssh_port` }}",
-      "ssh_private_key_file": "{{ user `ssh_private_key_file` }}",
       "ssh_username": "{{ user `ssh_username` }}",
       "type": "vmware-iso",
       "vm_name": "{{ user `vm_name` }}",
@@ -43,7 +44,7 @@
     [
       {
         "compression_level": 9,
-        "output": "{{ user `box_path` }}.{{ .Provider }}.box",
+        "output": "{{ user `build_directory` }}/vagrant/{{ .Provider }}.box",
         "type": "vagrant",
         "vagrantfile_template": "{{ template_dir }}/files/Vagrantfile.rb"
       },
@@ -57,22 +58,19 @@
   ],
   "provisioners": [
     {
-      "execute_command": "sudo bash {{.Path}}",
       "expect_disconnect": true,
       "script": "{{ template_dir }}/files/provision.sh",
       "type": "shell"
     },
     {
-      "execute_command": "sudo bash {{.Path}}",
       "script": "{{ template_dir }}/files/cleanup.sh",
       "type": "shell"
     }
   ],
   "variables": {
-    "box_path": "{{ user `build_directory` }}/{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
-    "box_tag": "{{ user `cloud_organization` }}/{{ user `os_product` | lower }}",
-    "box_version": "{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ timestamp }}",
-    "build_directory": "{{ template_dir }}/build",
+    "box_tag": "{{ user `cloud_organization` }}/{{ user `os_product` | lower }}{{ user `os_major` }}",
+    "box_version": "{{ user `os_build` }}.{{ timestamp }}",
+    "build_directory": "{{ template_dir }}/build/{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
     "cloud_organization": "{{ env `VAGRANT_CLOUD_ORGANIZATION` }}",
     "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
     "http_directory": "{{ template_dir }}/http",
@@ -84,18 +82,18 @@
     "os_major": "",
     "os_minor": "",
     "os_product": "",
+    "ssh_password": "vagrant",
     "ssh_port": "22",
-    "ssh_private_key_file": "{{ template_dir }}/files/id_rsa",
-    "ssh_username": "vagrant",
+    "ssh_username": "root",
     "vm_build_cpus": "2",
     "vm_build_memory": "512",
     "vm_cpus": "1",
-    "vm_disk_adapter": "pvscsi",
     "vm_disk_size": "20480",
     "vm_guest_os": "vmware-photon-64",
     "vm_headless": "true",
     "vm_memory": "512",
     "vm_name": "{{ user `os_product` }}",
-    "vm_network_adapter": "vmxnet3"
+    "vmware_disk_adapter": "pvscsi",
+    "vmware_network_adapter": "vmxnet3"
   }
 }
