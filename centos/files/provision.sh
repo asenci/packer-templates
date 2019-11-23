@@ -46,6 +46,24 @@ blacklist floppy
 EOF
 
 
+# Vagrant
+useradd --create-home --user-group vagrant
+install -o vagrant -g vagrant -m 0700 -d /home/vagrant/.ssh
+install -o vagrant -g vagrant -m 0600 /dev/null /home/vagrant/.ssh/authorized_keys
+curl -s -o /home/vagrant/.ssh/authorized_keys 'https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub'
+
+chpasswd 2>/dev/null << EOF
+vagrant:vagrant
+EOF
+
+cat > /etc/sudoers.d/vagrant << EOF
+Defaults:vagrant env_keep += \"SSH_AUTH_SOCK\"
+Defaults:vagrant !requiretty
+vagrant ALL=(ALL) NOPASSWD: ALL
+EOF
+chmod 0440 /etc/sudoers.d/vagrant
+
+
 # Locale
 cat > /etc/locale.conf << EOF
 LANG='en_US.UTF-8'
