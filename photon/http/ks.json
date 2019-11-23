@@ -49,7 +49,9 @@
     "",
     "PasswordAuthentication yes",
     "PermitRootLogin yes",
-    "EOF"
+    "EOF",
+    "",
+    "tdnf -q -y update linux-esx"
   ],
   "ui": true
 }

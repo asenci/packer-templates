@@ -108,7 +108,6 @@
   ],
   "provisioners": [
     {
-      "expect_disconnect": true,
       "script": "{{ template_dir }}/files/provision.sh",
       "type": "shell"
     },

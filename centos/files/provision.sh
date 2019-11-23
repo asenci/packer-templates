@@ -122,7 +122,3 @@ cat >>/etc/sysconfig/sshd <<EOF
 #  and man sshd for more information)
 OPTIONS="-u0"
 EOF
-
-
-# Reboot before cleanup
-/sbin/reboot
