@@ -67,7 +67,7 @@
       "iso_url": "{{ user `iso_url` }}",
       "memory": "{{ user `vm_build_memory` }}",
       "network_adapter_type": "{{ user `vmware_network_adapter` }}",
-      "output_directory": "{{ user `build_directory` }}/{{ build_type }}/{{ user `vm_name` | replace_all \" \" \"_\" }}.vmwarevm",
+      "output_directory": "{{ user `build_directory` }}/{{ build_type }}",
       "shutdown_command": "/sbin/halt -h -p",
       "ssh_password": "{{ user `ssh_password` }}",
       "ssh_port": "{{ user `ssh_port` }}",
