@@ -30,6 +30,8 @@
       "vmx_data": {
         "cpuid.coresPerSocket": "1",
         "rtc.diffFromUTC": "0",
+        "svga.autodetect": "false",
+        "svga.vramSize": "16777216",
         "tools.syncTime": "false"
       },
       "vmx_data_post": {
