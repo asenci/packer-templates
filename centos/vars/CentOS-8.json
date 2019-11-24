@@ -1,0 +1,4 @@
+{
+  "iso_checksum_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/CHECKSUM",
+  "iso_url": "{{ user `mirror_url` }}/{{ user `mirror_path` }}/{{ user `os_product` }}-{{ user `os_major` }}-{{ user `os_arch` }}-{{ user `os_build` }}-boot.iso"
+}
