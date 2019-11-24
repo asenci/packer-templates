@@ -117,8 +117,8 @@
     }
   ],
   "variables": {
-    "box_tag": "{{ user `cloud_organization` }}/{{ user `os_product` | lower }}{{ user `os_major` }}",
-    "box_version": "{{ user `os_build` }}.{{ timestamp }}",
+    "box_tag": "{{ user `cloud_organization` }}/{{ user `os_product` | lower }}",
+    "box_version": "{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ timestamp }}",
     "build_directory": "{{ template_dir }}/build/{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_build` }}-{{ user `os_arch` }}",
     "cloud_organization": "{{ env `VAGRANT_CLOUD_ORGANIZATION` }}",
     "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
@@ -144,7 +144,7 @@
     "vm_guest_os": "{{ user `os_product` | lower }}",
     "vm_headless": "true",
     "vm_memory": "512",
-    "vm_name": "{{ user `os_product` }} {{ user `os_major` }}",
+    "vm_name": "{{ user `os_product` }}",
     "vmware_disk_adapter": "pvscsi",
     "vmware_network_adapter": "vmxnet3"
   }
