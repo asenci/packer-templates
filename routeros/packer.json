@@ -1,0 +1,191 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "m",
+        "<right>",
+        "<right>",
+        "<down>",
+        "<down>",
+        "<spacebar>",
+        "i",
+        "n",
+        "y",
+        "<wait5>",
+        "<enter>",
+        "<wait15>",
+        "admin<enter>",
+        "<enter>",
+        "n",
+        "<enter>",
+        "<wait5>",
+        "/password<enter>",
+        "<enter>",
+        "vagrant<enter>",
+        "vagrant<enter>",
+        "/ip dhcp-client add interface=[find] disabled=no<enter>",
+        "<wait>",
+        "/quit<enter>"
+      ],
+      "cpus": "{{ user `vm_build_cpus` }}",
+      "disk_size": "{{ user `vm_disk_size` }}",
+      "guest_os_type": "linux-2.6",
+      "hard_drive_interface": "ide",
+      "host_interfaces": "{{ user `parallels_host_interfaces` }}",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_url": "{{ user `iso_url` }}",
+      "memory": "{{ user `vm_build_memory` }}",
+      "output_directory": "{{ user `build_directory` }}/{{ build_type }}",
+      "parallels_tools_mode": "disable",
+      "prlctl": [
+        [ "set", "{{ .Name }}", "--3d-accelerate", "off" ],
+        [ "set", "{{ .Name }}", "--adaptive-hypervisor", "on" ],
+        [ "set", "{{ .Name }}", "--battery-status", "off" ],
+        [ "set", "{{ .Name }}", "--bounce-dock-icon-when-app-flashes", "off" ],
+        [ "set", "{{ .Name }}", "--device-del", "sound0" ],
+        [ "set", "{{ .Name }}", "--device-del", "usb" ],
+        [ "set", "{{ .Name }}", "--keyboard-optimize", "off" ],
+        [ "set", "{{ .Name }}", "--sh-app-guest-to-host", "off" ],
+        [ "set", "{{ .Name }}", "--shared-clipboard", "off" ],
+        [ "set", "{{ .Name }}", "--shf-host-defined", "off" ],
+        [ "set", "{{ .Name }}", "--show-guest-app-folder-in-dock", "off" ],
+        [ "set", "{{ .Name }}", "--show-guest-notifications", "off" ],
+        [ "set", "{{ .Name }}", "--smart-mouse-optimize", "off" ],
+        [ "set", "{{ .Name }}", "--sync-host-printers", "off" ],
+        [ "set", "{{ .Name }}", "--time-sync", "off" ],
+        [ "set", "{{ .Name }}", "--videosize", "2" ]
+      ],
+      "prlctl_post": [
+        [ "set", "{{ .Name }}", "--cpus", "{{ user `vm_cpus` }}" ],
+        [ "set", "{{ .Name }}", "--device-del", "cdrom0" ],
+        [ "set", "{{ .Name }}", "--device-del", "net0" ],
+        [ "set", "{{ .Name }}", "--memsize", "{{ user `vm_memory` }}" ]
+      ],
+      "shutdown_command": "/system shutdown",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_port": "{{ user `ssh_port` }}",
+      "ssh_username": "{{ user `ssh_username` }}",
+      "type": "parallels-iso",
+      "vm_name": "{{ user `vm_name` }}"
+    },
+    {
+      "boot_command": [
+        "m",
+        "<right>",
+        "<right>",
+        "<down>",
+        "<down>",
+        "<spacebar>",
+        "i",
+        "n",
+        "y",
+        "<wait5>",
+        "<enter>",
+        "<wait15>",
+        "admin<enter>",
+        "<enter>",
+        "n",
+        "<enter>",
+        "<wait5>",
+        "/password<enter>",
+        "<enter>",
+        "vagrant<enter>",
+        "vagrant<enter>",
+        "/ip dhcp-client add interface=[find] disabled=no<enter>",
+        "<wait>",
+        "/quit<enter>"
+      ],
+      "cpus": "{{ user `vm_build_cpus` }}",
+      "disk_adapter_type": "ide",
+      "disk_size": "{{ user `vm_disk_size` }}",
+      "disk_type_id": "0",
+      "display_name": "{{ user `vm_name` }}",
+      "guest_os_type": "other3xlinux",
+      "headless": "true",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_url": "{{ user `iso_url` }}",
+      "memory": "{{ user `vm_build_memory` }}",
+      "network_adapter_type": "e1000e",
+      "output_directory": "{{ user `build_directory` }}/{{ build_type }}",
+      "shutdown_command": "/system shutdown",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_port": "{{ user `ssh_port` }}",
+      "ssh_username": "{{ user `ssh_username` }}",
+      "type": "vmware-iso",
+      "vm_name": "{{ user `vm_name` }}",
+      "vmdk_name": "{{ user `vm_name` }}",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "rtc.diffFromUTC": "0",
+        "svga.autodetect": "false",
+        "svga.vramSize": "16777216",
+        "tools.syncTime": "false"
+      },
+      "vmx_data_post": {
+        "ide0:0.present": "false",
+        "memsize": "{{ user `vm_memory` }}",
+        "numvcpus": "{{ user `vm_cpus` }}"
+      },
+      "vmx_remove_ethernet_interfaces": true
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "compression_level": 9,
+        "output": "{{ user `build_directory` }}/vagrant/{{ .Provider }}.box",
+        "type": "vagrant",
+        "vagrantfile_template": "{{ template_dir }}/files/Vagrantfile.rb"
+      },
+      {
+        "access_token": "{{ user `cloud_token` }}",
+        "box_tag": "{{ user `box_tag` }}",
+        "type": "vagrant-cloud",
+        "version": "{{ user `box_version` }}"
+      }
+    ]
+  ],
+  "provisioners": [
+    {
+      "execute_command": "/import {{ .Path }}",
+      "remote_path": "script.rsc",
+      "script": "{{ template_dir }}/files/provision.rsc",
+      "type": "shell"
+    },
+    {
+      "type": "file",
+      "source": "{{ template_dir }}/files/firstboot.rsc",
+      "destination": "firstboot.rsc"
+    },
+    {
+      "execute_command": "/import {{ .Path }}",
+      "remote_path": "script.rsc",
+      "script": "{{ template_dir }}/files/cleanup.rsc",
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "box_tag": "{{ user `cloud_organization` }}/{{ user `os_product` | lower }}",
+    "box_version": "{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_patch` }}-{{ timestamp }}",
+    "build_directory": "{{ template_dir }}/build/{{ user `os_product` }}-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_patch` }}",
+    "cloud_organization": "{{ env `VAGRANT_CLOUD_ORGANIZATION` }}",
+    "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
+    "iso_checksum": "",
+    "iso_url": "https://download.mikrotik.com/routeros/{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_patch` }}/mikrotik-{{ user `os_major` }}.{{ user `os_minor` }}.{{ user `os_patch` }}.iso",
+    "os_arch": "",
+    "os_major": "",
+    "os_minor": "",
+    "os_patch": "",
+    "os_product": "RouterOS",
+    "parallels_host_interfaces": "vnic0,vnic1,vnic2,vnic3,vnic4,vnic5,vnic6,vnic7,vnic8,vnic9",
+    "ssh_password": "vagrant",
+    "ssh_port": "22",
+    "ssh_username": "admin",
+    "vm_build_cpus": "1",
+    "vm_build_memory": "128",
+    "vm_cpus": "1",
+    "vm_disk_size": "128",
+    "vm_memory": "128",
+    "vm_name": "{{ user `os_product` }}"
+  }
+}

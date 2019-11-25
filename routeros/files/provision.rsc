@@ -1,0 +1,6 @@
+:put "adding vagrant user..."
+/user add name="vagrant" password="vagrant" group="full"
+:put "fetching vagrant default public key..."
+/tool fetch output="file" "https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub"
+:put "installing vagrant default public key..."
+/user ssh-keys import user="vagrant" public-key-file="vagrant.pub"
